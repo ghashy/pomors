@@ -108,12 +108,13 @@ fn start_timer(
         if !paused {
             flush_fn(stdout, remaining_sec, current_round)?;
             remaining_sec -= 1;
+            let elapsed = now.elapsed().unwrap().as_secs();
+            if elapsed > 2 {
+                println!("Sleeping detected!");
+                remaining_sec = (remaining_sec as i16 + 1 - elapsed as i16).max(0) as u16;
+            }
         }
         spin_sleep::sleep(Duration::from_secs(1));
-        let elapsed = now.elapsed().unwrap().as_secs();
-        if elapsed > 2 {
-            remaining_sec = (remaining_sec as i16 - elapsed as i16).max(0) as u16;
-        }
         now = SystemTime::now();
     }
     Ok(quited)
