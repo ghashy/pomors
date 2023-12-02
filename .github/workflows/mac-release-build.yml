@@ -82,14 +82,6 @@ jobs:
           echo "cargo command is: ${{ env.CARGO }}"
           echo "target flag is: ${{ env.TARGET_FLAGS }}"
 
-      - name: Set profile.release.strip = true
-        shell: bash
-        run: |
-          cat >> .cargo/config.toml <<EOF
-          [profile.release]
-          strip = true
-          EOF
-
       - name: Build release binary
         run: ${{ env.CARGO }} build --release --target ${{ matrix.target }}
 
