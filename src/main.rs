@@ -114,8 +114,8 @@ fn start_timer(
                 remaining_sec = (remaining_sec as i16 + 1 - elapsed as i16).max(0) as u16;
             }
         }
-        spin_sleep::sleep(Duration::from_secs(1));
         now = SystemTime::now();
+        spin_sleep::sleep(Duration::from_secs(1));
     }
     Ok(quited)
 }
