@@ -112,7 +112,7 @@ fn start_timer(
         spin_sleep::sleep(Duration::from_secs(1));
         let elapsed = now.elapsed().unwrap().as_secs();
         if elapsed > 2 {
-            remaining_sec = (remaining_sec - elapsed as u16).max(0);
+            remaining_sec = (remaining_sec as i16 - elapsed as i16).max(0) as u16;
         }
         now = SystemTime::now();
     }
