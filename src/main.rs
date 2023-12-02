@@ -1,7 +1,9 @@
 extern crate termion;
 
 use std::alloc::System;
-use std::io::{stdout, Stdout};
+use std::fmt::format;
+use std::fs::File;
+use std::io::{stdout, Stdout, Write};
 use std::sync::mpsc::Receiver;
 use std::time::{Duration, SystemTime};
 
@@ -110,7 +112,10 @@ fn start_timer(
             remaining_sec -= 1;
             let elapsed = now.elapsed().unwrap().as_secs();
             if elapsed > 2 {
-                println!("Sleeping detected!");
+                let mut file =
+                    File::create(format!("elapsed:{}_now:{:?}.txt", elapsed.to_string(), now))
+                        .unwrap();
+                file.write_all("Sleeping found".as_bytes()).unwrap();
                 remaining_sec = (remaining_sec as i16 + 1 - elapsed as i16).max(0) as u16;
             }
         }
