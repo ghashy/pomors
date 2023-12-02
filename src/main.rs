@@ -1,15 +1,13 @@
 extern crate termion;
 
+use std::alloc::System;
 use std::io::{stdout, Stdout};
 use std::sync::mpsc::Receiver;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
 
 use exitfailure::ExitFailure;
 use structopt::StructOpt;
 use termion::raw::{IntoRawMode, RawTerminal};
-
-use objc::runtime::{Class, Object};
-use objc::{class, msg_send, sel, sel_impl};
 
 mod key_handler;
 mod notification;
@@ -27,14 +25,6 @@ struct Option {
 }
 
 fn main() -> Result<(), ExitFailure> {
-    unsafe {
-        // Get the NSProcessInfo class
-        let process_info: *const Object = msg_send![class!(NSProcessInfo), processInfo];
-
-        // Disable sudden termination
-        let _: () = msg_send![process_info, disableSuddenTermination];
-    }
-    
     // receive cli arguemnts
     let args = Option::from_args();
 
@@ -104,6 +94,7 @@ fn start_timer(
     let mut quited = false;
     let mut paused = false;
     let mut remaining_sec = remaining_sec;
+    let mut now = SystemTime::now();
     while remaining_sec != 0 {
         match handle_input_on_timer(receiver) {
             key_handler::KeyAction::Quit => {
@@ -119,6 +110,11 @@ fn start_timer(
             remaining_sec -= 1;
         }
         spin_sleep::sleep(Duration::from_secs(1));
+        let elapsed = now.elapsed().unwrap().as_secs();
+        if elapsed > 2 {
+            remaining_sec = (remaining_sec - elapsed as u16).max(0);
+        }
+        now = SystemTime::now();
     }
     Ok(quited)
 }
