@@ -8,6 +8,9 @@ use exitfailure::ExitFailure;
 use structopt::StructOpt;
 use termion::raw::{IntoRawMode, RawTerminal};
 
+use objc::runtime::{Class, Object};
+use objc::{class, msg_send, sel, sel_impl};
+
 mod key_handler;
 mod notification;
 mod sound;
@@ -24,6 +27,14 @@ struct Option {
 }
 
 fn main() -> Result<(), ExitFailure> {
+    unsafe {
+        // Get the NSProcessInfo class
+        let process_info: *const Object = msg_send![class!(NSProcessInfo), processInfo];
+
+        // Disable sudden termination
+        let _: () = msg_send![process_info, disableSuddenTermination];
+    }
+    
     // receive cli arguemnts
     let args = Option::from_args();
 
