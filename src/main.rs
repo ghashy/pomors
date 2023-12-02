@@ -110,12 +110,10 @@ fn start_timer(
         if !paused {
             flush_fn(stdout, remaining_sec, current_round)?;
             remaining_sec -= 1;
+            // Handle case if computer is sleeping
             let elapsed = now.elapsed().unwrap().as_secs();
+            // Possibly we can print how much time computer was sleeping
             if elapsed > 2 {
-                let mut file =
-                    File::create(format!("elapsed:{}_now:{:?}.txt", elapsed.to_string(), now))
-                        .unwrap();
-                file.write_all("Sleeping found".as_bytes()).unwrap();
                 remaining_sec = (remaining_sec as i16 + 1 - elapsed as i16).max(0) as u16;
             }
         }
