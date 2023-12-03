@@ -68,8 +68,13 @@ jobs:
 
       - name: debug install brew
         run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        
       - name: debug install tree
         run: brew install tree
+
+      - name: debug run tree
+        if: ${{ always() }}
+        run: tree ./
       
       - name: Upload binaries as artifact for aarch64
         if: ${{ matrix.target }} == aarch64-apple-darwin
