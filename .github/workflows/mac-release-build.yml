@@ -4,30 +4,6 @@ on:
   repository_dispatch:
     types: [manual-build]
 
-# jobs:
-#   build:
-#     runs-on: macos-latest
-
-#     steps:
-#       - uses: actions/checkout@v1
-#       - uses: actions-rs/toolchain@v1
-#         with:
-#           toolchain: stable
-#       - uses: actions-rs/cargo@v1.0.1
-#         with:
-#           name: Build
-#           command: build
-#           args: --release
-#       - uses: actions-rs/cargo@v1.0.1
-#         with:
-#           name: Test
-#           command: test
-#           args: --release
-#       - uses: actions/upload-artifact@v1
-#         with:
-#           name: pomors_mac
-#           path: target/release/pomors
-
 jobs:
   dist:
     name: Dist
@@ -53,6 +29,11 @@ jobs:
           target: aarch64-apple-darwin
           cross: false
           skip_tests: true  # x86_64 host can't run aarch64 code
+        - build: x86_64-macos
+          os: macos-latest
+          rust: stable
+          target: x86_64-apple-darwin
+          cross: false
     runs-on: ${{ matrix.os }}
 
     steps:
