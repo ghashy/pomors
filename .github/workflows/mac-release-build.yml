@@ -66,14 +66,14 @@ jobs:
       - name: Build release binary
         run: ${{ env.CARGO }} build --release --target ${{ matrix.target }}
       
-      - name: Upload binaries as artifact
+      - name: Upload binaries as artifact for aarch64
         if: ${{ matrix.target }} == aarch64-apple-darwin
         uses: actions/upload-artifact@v3
         with:
           name: release-darwin-aarch64-apple-darwin
           path: target/aarch64-apple-darwin/release/pomors
 
-      - name: Upload binaries as artifact
+      - name: Upload binaries as artifact for x86
         if: ${{ matrix.target }} == x86_64-apple-darwin
         uses: actions/upload-artifact@v3
         with:
