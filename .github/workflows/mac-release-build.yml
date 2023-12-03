@@ -65,16 +65,16 @@ jobs:
 
       - name: Build release binary
         run: ${{ env.CARGO }} build --release --target ${{ matrix.target }}
-
-      - name: Upload binaries to release
-        uses: svenstaro/upload-release-action@v2
-        with:
-          file: target/*
-          file_glob: true
-          overwrite: true
       
       - name: Upload binaries as artifact
         uses: actions/upload-artifact@v3
         with:
-          name: release
-          path: target/aarch64-apple-darwin/release/pomors
+          artifacts: |
+            [
+              { "name": "release-darwin-aarch64", "path": "target/aarch64-apple-darwin/release/pomors" },
+              { "name": "release-darwin-x86", "path": "target/release/pomors" }
+            ]
+          # name: release
+          # path: |
+          #   target/aarch64-apple-darwin/release/pomors
+          #   target/release/pomors
