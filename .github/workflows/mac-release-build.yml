@@ -65,6 +65,11 @@ jobs:
 
       - name: Build release binary
         run: ${{ env.CARGO }} build --release --target ${{ matrix.target }}
+
+      - name: debug install brew
+        run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - name: debug install tree
+        run: brew install tree
       
       - name: Upload binaries as artifact for aarch64
         if: ${{ matrix.target }} == aarch64-apple-darwin
@@ -78,4 +83,4 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: release-x86-apple-darwin
-          path: target/release/pomors
+          path: target/x86_64-apple-darwin/release/pomors
