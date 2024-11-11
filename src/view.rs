@@ -1,73 +1,109 @@
 use std::io::Write;
 
+use crossterm::{
+    cursor::{MoveTo, Show},
+    execute,
+    style::{ContentStyle, StyledContent},
+    terminal::Clear,
+};
 use failure::ResultExt;
-use termion::{clear, color};
 
-pub fn flush_work_timer(stdout: &mut impl Write, remaining_sec: u16, current_round: u64)
-                        -> Result<(), failure::Error> {
-    write!(
+pub fn flush_work_timer(
+    stdout: &mut impl Write,
+    remaining_sec: u16,
+    current_round: u64,
+) -> Result<(), failure::Error> {
+    execute!(
         stdout,
-        "{timer_cursor}{color}{clear}\u{1F345} {timer} (Round {current_round}){desc_cursor}[Q]: quit, [Space]: pause/resume",
-        timer_cursor = termion::cursor::Goto(2, 1),
-        color = color::Fg(color::Red),
-        clear = clear::All,
-        timer = convert_to_min(remaining_sec),
-        current_round = current_round,
-        desc_cursor = termion::cursor::Goto(2, 2)
-    ).context("failed to show work timer")?;
+        MoveTo(2, 1),
+        Clear(crossterm::terminal::ClearType::All),
+        crossterm::style::PrintStyledContent(StyledContent::new(
+            ContentStyle {
+                foreground_color: Some(crossterm::style::Color::Red),
+                ..Default::default()
+            },
+            format!(
+                "\u{1F345} {} (Round {current_round})",
+                convert_to_min(remaining_sec)
+            ),
+        )),
+        MoveTo(2, 2),
+        crossterm::style::Print(format!("[Q]: quit, [Space]: pause/resume")),
+    )
+    .context("failed to show work timer")?;
     stdout.flush().context("failed to flush work timer")?;
     Ok(())
 }
 
-pub fn flush_break_timer(stdout: &mut impl Write, remaining_sec: u16, current_round: u64)
-                         -> Result<(), failure::Error> {
-    write!(
+pub fn flush_break_timer(
+    stdout: &mut impl Write,
+    remaining_sec: u16,
+    current_round: u64,
+) -> Result<(), failure::Error> {
+    execute!(
         stdout,
-        "{timer_cursor}{color}{clear}\u{2615} {timer} (Round {current_round}){desc_cursor}[Q]: quit, [Space]: pause/resume",
-        timer_cursor = termion::cursor::Goto(2, 1),
-        color = color::Fg(color::Green),
-        clear = clear::All,
-        timer = convert_to_min(remaining_sec),
-        current_round = current_round,
-        desc_cursor = termion::cursor::Goto(2, 2)
-    ).context("failed to show break timer")?;
+        MoveTo(2, 1),
+        Clear(crossterm::terminal::ClearType::All),
+        crossterm::style::PrintStyledContent(StyledContent::new(
+            ContentStyle {
+                foreground_color: Some(crossterm::style::Color::Green),
+                ..Default::default()
+            },
+            format!(
+                "\u{2615} {} (Round {current_round})",
+                convert_to_min(remaining_sec)
+            ),
+        )),
+        MoveTo(2, 2),
+        crossterm::style::Print(format!("[Q]: quit, [Space]: pause/resume")),
+    )
+    .context("failed to show break timer")?;
     stdout.flush().context("failed to flush break timer")?;
     Ok(())
 }
 
 pub fn flush_break_interval(stdout: &mut impl Write) -> Result<(), failure::Error> {
-    write!(
+    execute!(
         stdout,
-        "{msg_cursor}{color}{clear}\u{1F389} press Enter to take a break{desc_cursor}[Q]: quit, [Enter]: start",
-        msg_cursor = termion::cursor::Goto(2, 1),
-        color = color::Fg(color::Green),
-        clear = clear::All,
-        desc_cursor = termion::cursor::Goto(2, 2)
-    ).context("failed to show break interval")?;
+        MoveTo(2, 1),
+        Clear(crossterm::terminal::ClearType::All),
+        crossterm::style::PrintStyledContent(StyledContent::new(
+            ContentStyle {
+                foreground_color: Some(crossterm::style::Color::Green),
+                ..Default::default()
+            },
+            format!("\u{1F389} press Enter to take a break",),
+        )),
+        MoveTo(2, 2),
+        crossterm::style::Print(format!("[Q]: quit, [Enter]: start")),
+    )
+    .context("failed to show break interval")?;
     stdout.flush().context("failed to flush break interval")?;
     Ok(())
 }
 
 pub fn flush_work_interval(stdout: &mut impl Write) -> Result<(), failure::Error> {
-    write!(
+    execute!(
         stdout,
-        "{msg_cursor}{color}{clear}\u{1F514} press Enter to work!!{desc_cursor}[Q]: quit, [Enter]: start",
-        msg_cursor = termion::cursor::Goto(2, 1),
-        color = color::Fg(color::Red),
-        clear = clear::All,
-        desc_cursor = termion::cursor::Goto(2, 2)
-    ).context("failed to show work interval")?;
+        MoveTo(2, 1),
+        Clear(crossterm::terminal::ClearType::All),
+        crossterm::style::PrintStyledContent(StyledContent::new(
+            ContentStyle {
+                foreground_color: Some(crossterm::style::Color::Red),
+                ..Default::default()
+            },
+            format!("\u{1F389} press Enter to work!!",),
+        )),
+        MoveTo(2, 2),
+        crossterm::style::Print(format!("[Q]: quit, [Enter]: start")),
+    )
+    .context("failed to show work interval")?;
     stdout.flush().context("failed to flush work interval")?;
     Ok(())
 }
 
 pub fn release_raw_mode(stdout: &mut impl Write) -> Result<(), failure::Error> {
-    write!(
-        stdout,
-        "{}{}",
-        termion::cursor::Goto(1, 1),
-        termion::cursor::Show
-    ).context("failed to release raw mode")?;
+    execute!(stdout, MoveTo(1, 1), Show).context("failed to release raw mode")?;
     Ok(())
 }
 

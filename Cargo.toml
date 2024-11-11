@@ -16,10 +16,11 @@ exclude = ["pomors.gif"]
 
 [dependencies]
 structopt = "0.3.20"
+# clap = "4.5.20"
+
 failure = "0.1.8"
 exitfailure = "0.5.1"
-spin_sleep = "1.0.0"
-termion = "1.5.5"
-notify-rust = "4.0.0"
-rodio = "0.12.0"
-objc = "0.2.7"
+spin_sleep = "1.2.1"
+crossterm = "0.28.1"
+notify-rust = "4.11.3"
+rodio = "0.20.1"

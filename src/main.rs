@@ -1,15 +1,10 @@
-extern crate termion;
-
-use std::alloc::System;
-use std::fmt::format;
-use std::fs::File;
-use std::io::{stdout, Stdout, Write};
+use std::io::{stdout, Stdout};
 use std::sync::mpsc::Receiver;
 use std::time::{Duration, SystemTime};
 
+use crossterm::{execute, terminal};
 use exitfailure::ExitFailure;
 use structopt::StructOpt;
-use termion::raw::{IntoRawMode, RawTerminal};
 
 mod key_handler;
 mod notification;
@@ -34,7 +29,10 @@ fn main() -> Result<(), ExitFailure> {
     let receiver = key_handler::run();
 
     // start timer
-    let mut stdout = stdout().into_raw_mode().unwrap();
+    terminal::enable_raw_mode().unwrap();
+    let mut stdout = stdout();
+    execute!(stdout, terminal::EnterAlternateScreen).unwrap();
+
     let mut round: u64 = 1;
     loop {
         // work timer
@@ -90,8 +88,8 @@ fn start_timer(
     remaining_sec: u16,
     current_round: u64,
     receiver: &Receiver<key_handler::KeyAction>,
-    stdout: &mut RawTerminal<Stdout>,
-    flush_fn: fn(s: &mut RawTerminal<Stdout>, t: u16, c: u64) -> Result<(), failure::Error>,
+    stdout: &mut Stdout,
+    flush_fn: fn(s: &mut Stdout, t: u16, c: u64) -> Result<(), failure::Error>,
 ) -> Result<bool, failure::Error> {
     let mut quited = false;
     let mut paused = false;
@@ -132,7 +130,7 @@ fn handle_input_on_timer(receiver: &Receiver<key_handler::KeyAction>) -> key_han
 }
 
 fn handle_input_on_interval(
-    stdout: &mut RawTerminal<Stdout>,
+    stdout: &mut Stdout,
     receiver: &Receiver<key_handler::KeyAction>,
 ) -> Result<bool, failure::Error> {
     let mut quited = false;
